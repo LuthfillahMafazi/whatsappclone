@@ -1,11 +1,14 @@
 package com.zii.whatsappclone.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,6 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.zii.whatsappclone.R
 import com.zii.whatsappclone.adapter.SectionPagerAdapter
 import com.zii.whatsappclone.fragment.ChatsFragment
+import com.zii.whatsappclone.utils.DATA_USERS
+import com.zii.whatsappclone.utils.DATA_USER_PHONE
 import com.zii.whatsappclone.utils.PERMISSION_REQUEST_READ_CONTACT
 import com.zii.whatsappclone.utils.REQUEST_NEW_CHATS
 import kotlinx.android.synthetic.main.activity_main.*
@@ -175,6 +180,54 @@ class MainActivity : AppCompatActivity() {
             rootView.section_label.text =
                 "Hello world, from section ${arguments?.getInt(ARG_SECTION_NUMBER)}"
             return rootView
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_NEW_CHATS -> {
+                    val name = data?.getStringExtra(PARAM_NAME) ?: ""
+                    val phone = data?.getStringExtra(PARAM_PHONE) ?: ""
+                    checkNewChatUser(name, phone)
+                }
+            }
+        }
+    }
+
+    private fun checkNewChatUser(name: String, phone: String) {
+        if (!name.isNullOrEmpty() && !phone.isNullOrEmpty()) {
+            firebaseDb.collection(DATA_USERS)
+                .whereEqualTo(DATA_USER_PHONE, phone)
+                .get()
+                .addOnSuccessListener {
+                    if (it.documents.size > 0) {
+                        chatsFragment.newChat(it.documents[0].id)
+                    } else {
+                        AlertDialog.Builder(this)
+                            .setTitle("User not found")
+                            .setMessage("$name does not have an account. Send them an SMS to install this app.")
+                            .setPositiveButton("OK") { dialog, which ->
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.data = Uri.parse("sms:$phone")
+                                intent.putExtra(
+                                    "sms_body",
+                                    "Hi I'm using this new cool WhatsAppClone app. You should install it too so we can chat there."
+                                )
+                                startActivity(intent)
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .setCancelable(false)
+                            .show()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "An error occured. Please try again later",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    e.printStackTrace()
+                }
         }
     }
 }

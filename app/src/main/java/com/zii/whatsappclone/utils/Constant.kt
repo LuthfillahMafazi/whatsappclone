@@ -14,6 +14,7 @@ package com.zii.whatsappclone.utils
     val DATA_USER_STATUS: String = "status"
     val DATA_USER_STATUS_URL: String = "statusUrl"
     val DATA_USER_STATUS_TIME: String = "statusTime"
+    val DATA_USER_CHATS = "userChats"
 
     val DATA_CHATS = "Chats"
     val DATA_CHAT_PARTICIPANTS = "chatParticipants"
