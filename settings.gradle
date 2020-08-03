@@ -1,0 +1,2 @@
+rootProject.name='whatsappclone'
+include ':app'
