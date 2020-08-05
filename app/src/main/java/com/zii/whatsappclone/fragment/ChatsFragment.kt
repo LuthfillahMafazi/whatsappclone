@@ -1,5 +1,6 @@
 package com.zii.whatsappclone.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.zii.whatsappclone.R
 import com.zii.whatsappclone.adapter.ChatsAdapter
 import com.zii.whatsappclone.listener.ChatClickListener
 import com.zii.whatsappclone.listener.FailureCallback
+import com.zii.whatsappclone.main.ConversationActivity
 import com.zii.whatsappclone.model.Chat
 import com.zii.whatsappclone.utils.DATA_CHATS
 import com.zii.whatsappclone.utils.DATA_USERS
@@ -140,6 +142,6 @@ class ChatsFragment : Fragment(), ChatClickListener {
         chatsImageUrl: String?,
         chatsName: String?
     ) {
-        Toast.makeText(context, " clicked", Toast.LENGTH_SHORT).show()    }
-
+        startActivity(ConversationActivity.newIntent(context, chatId, chatsImageUrl, otherUserId, chatsName))
+        }
 }
